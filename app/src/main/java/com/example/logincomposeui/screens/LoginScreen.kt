@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.logincomposeui.components.ButtonComponent
 import com.example.logincomposeui.components.ClickableLoginTextComponent
 import com.example.logincomposeui.components.DividerItemComponent
@@ -20,12 +21,14 @@ import com.example.logincomposeui.components.NormalTextComponent
 import com.example.logincomposeui.components.PasswordFieldComponent
 import com.example.logincomposeui.components.TextFieldComponent
 import com.example.logincomposeui.components.UnderlineClickableTextComponent
+import com.example.logincomposeui.data.LoginViewModel
+import com.example.logincomposeui.data.UIEvent
 import com.example.logincomposeui.navigation.AppRouter
 import com.example.logincomposeui.navigation.Screen
 import com.example.logincomposeui.navigation.SystemBackButtonHandler
 
 @Composable
-fun LoginScreen(){
+fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -35,14 +38,30 @@ fun LoginScreen(){
         Column(Modifier.fillMaxSize()) {
             NormalTextComponent(value = "Olá!")
             HeaderTextComponent(value = "Bem vindo de volta")
-            TextFieldComponent(labelText = "Email", image = android.R.drawable.ic_dialog_email)
-            PasswordFieldComponent(labelText = "Senha")
+            TextFieldComponent(
+                labelText = "Email",
+                image = android.R.drawable.ic_dialog_email,
+                onTextChanged = {
+                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                }
+            )
+            PasswordFieldComponent(
+                labelText = "Senha",
+                onTextChanged = {
+                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            UnderlineClickableTextComponent(value = "Esqueci a senha"){
+            UnderlineClickableTextComponent(value = "Esqueci a senha") {
                 AppRouter.navigateTo(Screen.NewPasswordScreen)
             }
             Spacer(modifier = Modifier.height(80.dp))
-            ButtonComponent(value = "Login")
+            ButtonComponent(
+                value = "Login",
+                buttonClicked = {
+                    loginViewModel.onEvent(UIEvent.ButtonClicked)
+                }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             DividerItemComponent()
             ClickableLoginTextComponent(goToLogin = false) {
@@ -51,7 +70,7 @@ fun LoginScreen(){
         }
     }
 
-    SystemBackButtonHandler{
+    SystemBackButtonHandler {
         AppRouter.navigateTo(Screen.SignUpScreen)
     }
 }
@@ -59,6 +78,6 @@ fun LoginScreen(){
 
 @Composable
 @Preview
-fun DefaultPreviewLoginScreen(){
+fun DefaultPreviewLoginScreen() {
     LoginScreen()
 }

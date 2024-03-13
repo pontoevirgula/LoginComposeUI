@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -92,8 +91,8 @@ fun HeaderTextComponent(value: String) {
 
 @SuppressLint("PrivateResource")
 @Composable
-fun TextFieldComponent(labelText: String, image: Int) {
-    val text = remember { mutableStateOf(TextFieldValue("")) }
+fun TextFieldComponent(labelText: String, image: Int, onTextChanged: (String) -> Unit) {
+    val text = remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,7 +106,10 @@ fun TextFieldComponent(labelText: String, image: Int) {
             focusedBorderColor = colorResource(id = R.color.colorPrimary),
             focusedLabelColor = colorResource(id = R.color.colorPrimary),
         ),
-        onValueChange = { text.value = it },
+        onValueChange = {
+            text.value = it
+            onTextChanged(it)
+        },
         label = { Text(labelText) },
         leadingIcon = {
             Icon(painter = painterResource(id = image), contentDescription = "item do formulario")
@@ -116,9 +118,9 @@ fun TextFieldComponent(labelText: String, image: Int) {
 }
 
 @Composable
-fun PasswordFieldComponent(labelText: String) {
+fun PasswordFieldComponent(labelText: String, onTextChanged: (String) -> Unit) {
     val localFocusManager = LocalFocusManager.current
-    val password = remember { mutableStateOf(TextFieldValue("")) }
+    val password = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier
@@ -136,7 +138,10 @@ fun PasswordFieldComponent(labelText: String) {
             focusedBorderColor = colorResource(id = R.color.colorPrimary),
             focusedLabelColor = colorResource(id = R.color.colorPrimary),
         ),
-        onValueChange = { password.value = it },
+        onValueChange = {
+            password.value = it
+            onTextChanged(it)
+        },
         label = { Text(labelText) },
         leadingIcon = {
             Icon(painter = painterResource(id = R.drawable.password), contentDescription = "senha")
@@ -202,9 +207,9 @@ fun ClickableTextComponent(onTextSelected: (String) -> Unit) {
 }
 
 @Composable
-fun ButtonComponent(value: String) {
+fun ButtonComponent(value: String, buttonClicked: () -> Unit) {
     Button(
-        onClick = { },
+        onClick = { buttonClicked.invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(48.dp),
