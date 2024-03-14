@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -24,6 +25,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -91,7 +93,12 @@ fun HeaderTextComponent(value: String) {
 
 @SuppressLint("PrivateResource")
 @Composable
-fun TextFieldComponent(labelText: String, image: Int, onTextChanged: (String) -> Unit) {
+fun TextFieldComponent(
+    labelText: String,
+    image: Int,
+    onTextChanged: (String) -> Unit,
+    errorStatus : Boolean = false
+) {
     val text = remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = Modifier
@@ -113,12 +120,17 @@ fun TextFieldComponent(labelText: String, image: Int, onTextChanged: (String) ->
         label = { Text(labelText) },
         leadingIcon = {
             Icon(painter = painterResource(id = image), contentDescription = "item do formulario")
-        }
+        },
+        isError = !errorStatus
     )
 }
 
 @Composable
-fun PasswordFieldComponent(labelText: String, onTextChanged: (String) -> Unit) {
+fun PasswordFieldComponent(
+    labelText: String,
+    onTextChanged: (String) -> Unit,
+    errorStatus : Boolean = false
+) {
     val localFocusManager = LocalFocusManager.current
     val password = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
@@ -154,22 +166,25 @@ fun PasswordFieldComponent(labelText: String, onTextChanged: (String) -> Unit) {
                 Icon(imageVector = iconImage, contentDescription = description)
             }
         },
-        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = !errorStatus
     )
 }
 
 @Composable
-fun CheckboxComponent(onTextSelected: (String) -> Unit) {
+fun CheckboxComponent(isChecked : Boolean = false, onTextSelected: (String) -> Unit, onChecked: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val isChecked = remember { mutableStateOf(false) }
         Checkbox(
-            checked = isChecked.value,
-            onCheckedChange = { isChecked.value != isChecked.value })
+            checked = isChecked,
+            onCheckedChange = {
+                onChecked(it)
+            }
+        )
         ClickableTextComponent(onTextSelected)
     }
 }
@@ -344,4 +359,13 @@ fun UnderlineClickableTextComponent(value: String, onClick: () -> Unit) {
         textAlign = TextAlign.Center,
         textDecoration = TextDecoration.Underline,
     )
+}
+
+@Composable
+fun ErrorComponent(text: String?){
+    Text(
+        text = text ?: "",
+        color = MaterialTheme.colorScheme.error
+    )
+    Spacer(modifier = Modifier.height(16.dp))
 }
